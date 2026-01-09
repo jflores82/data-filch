@@ -6,7 +6,7 @@ __lua__
 
 -- debug -- REMEMBER TO DISABLE BEFORE RELEASE --
 debug_side_en = false
-debug_top_en = true
+debug_top_en = false
 
 -------------------------------------------
 -- ECHO DELETE BEFORE RELEASE 
@@ -87,8 +87,11 @@ function init_vars()
 		max_spd = 1,
 		spd_delta = 0.1,
 		spd = 0,
-		bit = 1
+		bit = 1,
+		shot_delay = 30,
+		shot_timer = 0,
 	}
+	en_top_shots = {}
 		
 	pickups_top = {}
 	
@@ -111,6 +114,9 @@ function init_vars()
 		gameover = 8
 	}
 	currentstate = 5
+	
+	--DEBUG REMOVE BEFORE RELEASE --
+	top_new_level()
 		
 end
 
@@ -334,7 +340,7 @@ end
 --
 -- TOP DOWN
 --
-function top_reset()
+function top_new_level()
 	player_top = { 
 		x = 100, 
 		y = 150,
@@ -342,11 +348,62 @@ function top_reset()
 		dir = 0,
 		walk_ani = 0,  
 		walk_max = 16,
-		safe = true,
+		safe = false,
 	}
 	
-	blocks_top = {}
+	en_top = { 
+		x = 8,
+		y = 240,
+		ani = 0,
+		ani_max = 8, 
+		move = false, 
+		max_spd = 1,
+		spd_delta = 0.1,
+		spd = 0,
+		bit = 1,
+		shot_delay = 30,
+		shot_timer = 0,
+	}
+	en_top_shots = {}
 	pickups_top = {}
+	blocks_top = {}
+	
+	level_top = { 
+		en_top_speed = 1,
+		en_top_spddif = 0.1,
+		pickups = 5,
+	}
+	
+	blocks_top_generate()
+	pickups_top_generate()
+	
+end
+
+function top_reset() 
+	player_top = { 
+		x = 100, 
+		y = 150,
+		flip = false,
+		dir = 0,
+		walk_ani = 0,  
+		walk_max = 16,
+		safe = false,
+	}
+	
+	en_top = { 
+		x = 8,
+		y = 240,
+		ani = 0,
+		ani_max = 8, 
+		move = false, 
+		max_spd = 1,
+		spd_delta = 0.1,
+		spd = 0,
+		bit = 1,
+		shot_delay = 30,
+		shot_timer = 0,
+	}
+	en_top_shots = {}
 end
 
 function player_top_control()
@@ -454,11 +511,18 @@ function player_top_draw()
 	spr(playerspr, player_top.x, player_top.y, 1,1, player_top.flip)
 end
 
+function player_top_death_draw(ani)
+	if(ani >= 0 and ani < 4) then spr(7, player_top.x, player_top.y) end
+	if(ani > 4  and ani <= 8) then spr(8, player_top.x, player_top.y) end
+	if(ani > 8  and ani <= 12) then spr(9, player_top.x, player_top.y) end
+	if(ani > 12 and ani <= 16) then spr(10, player_top.x, player_top.y) end
+end
+
 function pickups_top_generate()
 	local tx_min = 1
 	local tx_max = 14
 	local ty_min = 17
-	local ty_max = 29
+	local ty_max = 28
 	local new_x = flr(rnd(tx_max - tx_min + 1)) + tx_min
 	local new_y = flr(rnd(ty_max - ty_min + 1)) + ty_min
 		
@@ -550,11 +614,13 @@ function en_top_control()
 		
 		if(en_top.x < player_top.x + 8) then
 			en_top.spd += en_top.spd_delta
+			en_top_calculate_shot(1)
 			if(en_top.spd >= en_top.max_spd) then en_top.spd = en_top.max_spd end
 		end
 		
 		if(en_top.x > player_top.x - 12) then
 			en_top.spd -= en_top.spd_delta
+			en_top_calculate_shot(0)
 			if(en_top.spd <= (en_top.max_spd * -1)) then en_top.spd = (en_top.max_spd * - 1) end
 		end
 		
@@ -577,11 +643,67 @@ function en_top_control()
 	end
 end
 
-function en_top_calculate_shot(dir, dist)
-	dir = dir or -1
-	dist = dist or 0
+function en_top_calculate_shot(en_dir)
+	en_dir = en_dir or -1
+	local x_offset = en_top.x - player_top.x
+	if(x_offset <= 0) then
+		x_offset *= -1
+	end
+	local y_offset = en_top.y - player_top.y
+	
+	if(en_dir == 1) and (player_top.dir == 0) and (x_offset > 5) and (x_offset < 40) then
+		en_top_create_shot()
+	end
+	
+	if(en_dir == 0) and (player_top.dir == 1) and (x_offset > 5) and (x_offset < 40) then
+		en_top_create_shot()
+	end
+end
+
+function en_top_create_shot()
+	if(#en_top_shots < 3) and (en_top.shot_timer == 0) and (player_top.safe == false) then
+		add(en_top_shots, {x = en_top.x + 6, y = en_top.y - 8})
+		en_top.shot_timer = 1
+	end
+end
+
+function en_top_shots_update()
+	for i = #en_top_shots, 1, -1 do
+		en_top_shots[i].y -= 1
+		
+		local en_x = en_top_shots[i].x
+		local en_y = en_top_shots[i].y
+		local pl_x = player_top.x
+		local pl_y = player_top.y
+		
+		if(en_x + 8 > pl_x) and (en_x < pl_x + 6) and (en_y + 8> pl_y) and (en_y < pl_y + 9) then 
+			deli(en_top_shots, i)
+			if (debug_top_en == false) then
+				state_switch(game_states.top_death)
+			end
+			break
+		end
+		
+		if(en_top_shots[i].y <= 136) then
+			deli(en_top_shots, i)
+		end
+	end
+	
+	if(en_top.shot_timer > 0) then
+		en_top.shot_timer +=1
+	end
+	if(en_top.shot_timer >= en_top.shot_delay) then
+		en_top.shot_timer = 0
+	end
 	
 end
+
+function en_top_shots_draw()
+	for i = #en_top_shots, 1, -1 do 
+		spr(24, en_top_shots[i].x, en_top_shots[i].y)
+	end
+end
+
 
 ------------------------------
 -- General / Misc Functions --
@@ -632,8 +754,8 @@ function debug_top()
 	--	print(i..":x="..pickups_top[i].x..":y="..pickups_top[i].y..":tx="..pickups_top[i].tx..":ty="..pickups_top[i].ty, 10, 128 + offsety, 7)
 	--	offsety += 8
 	--end
-	print("en_spd="..en_top.spd, 10, 128+10, 7)
-	print("en_ani="..en_top.ani, 10, 128+18, 7)
+	--print("en_spd="..en_top.spd, 10, 128+10, 7)
+	--print("en_ani="..en_top.ani, 10, 128+18, 7)
 	
 	
 	
@@ -712,8 +834,8 @@ gamestate = {
 		update = function(self)
 			self.i += 1
 			if(self.i > 60) then
-				side_reset()
-				state_switch(game_states.side_play)
+				top_new_level()
+				state_switch(game_states.top_play)
 			end
 		end, 
 		
@@ -736,8 +858,7 @@ gamestate = {
 	
 	[5] = { --topdown play
 		enter = function(self)
-			blocks_top_generate()
-			pickups_top_generate()
+			
 		end,
 		
 		update = function(self)
@@ -745,6 +866,7 @@ gamestate = {
 			pickups_top_collision()
 			
 			en_top_control()
+			en_top_shots_update()
 			
 			if(#pickups_top <= 0) then
 				state_switch(game_states.top_win)
@@ -758,6 +880,7 @@ gamestate = {
 			pickups_top_draw()
 			player_top_draw()
 			en_top_draw()
+			en_top_shots_draw()
 			
 			
 			print_echoes(7, 10, 150)
@@ -770,19 +893,29 @@ gamestate = {
 	
 	[6] = { -- top death
 		enter = function(self) 
-		
+			self.pl = 0
 		end, 
 		
 		update = function(self) 
-		
+			self.pl += 1
+			if(self.pl > 50) then
+				top_reset()
+				state_switch(game_states.top_play)
+			end
 		end, 
 		
 		draw = function(self) 
-		
+			cls()
+			camera(0, 128)
+			map(0, 15, 0, 128, 16, 16)
+			pickups_top_draw()
+			en_top_draw()
+			en_top_shots_draw()
+			player_top_death_draw(self.pl)
 		end, 
 	},
 	
-	[7] = {
+	[7] = { -- top complete
 		enter = function(self)
 			blocks_top = {}
 			self.i = 0
@@ -790,7 +923,10 @@ gamestate = {
 		
 		update = function(self) 
 			self.i += 1
-			if(self.i >= 60) then state_switch(game_states.side_play) end
+			if(self.i >= 60) then 
+				side_reset()
+				state_switch(game_states.side_play) 
+			end
 		end, 
 		
 		draw = function(self)
@@ -814,14 +950,14 @@ __gfx__
 00056000000cc00000056000000cc000000000000004f000000000000000000000080000000008000000000000000000000550000005c000000550000005c000
 000cc00000c00c0000065000000000000000000000044000000000000000000000000000800000000080000000000e00000cc000000cc000000cc000000cc000
 000cc000000000c0000cc000000000000000000000000000000000000000000000000000000000000000800000000000000cc000000c0000000cc000000c0000
-00000000000000000004400000044000000000311300000000000031130000000000000000000000000000000000000000000000000000000000000000000000
-0600000000060000000ff00000044000000000311300000000000031130000000000000000000000000000000000000000000000000000000000000000000000
-0060080000600600000ff00000044000080000311300009009000031130000800000000000000000000000000000000000000000000000000000000000000000
-00555500005555000065560000655600033300311300333003330031130033300000000000000000000000000000000000000000000000000000000000000000
-0060065000600b50000550000005500003b3031111303b3003b3031111303b300000000000000000000000000000000000000000000000000000000000000000
-0600000000060000000c5000000c500003bb3bbbbbb3bb3003bb3bbbbbb3bb300000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000cc000000cc00003bbbb5555bbbb3003bbbb5555bbbb300000000000000000000000000000000000000000000000000000000000000000
-00000000000000000000c0000000c000003b33555533b300003b33555533b3000000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000440000004400000000031130000000000003113000000000aa00000666600006666000066660000666600000000000000000000000000
+0600000000060000000ff000000440000000003113000000000000311300000000aaaa0006000560060445600600056006044560000000000000000000000000
+0060080000600600000ff000000440000800003113000090090000311300008000aaaa0006005060060f506006005060060f5060000000000000000000000000
+0055550000555500006556000065560003330031130033300333003113003330009779000c0500c00c05f0c00b0500b00b05f0b0000000000000000000000000
+0060065000600b50000550000005500003b3031111303b3003b3031111303b30009aa9000c5005c00c5dd5c00b5005b00b5dd5b0000000000000000000000000
+0600000000060000000c5000000c500003bb3bbbbbb3bb3003bb3bbbbbb3bb30009aa9000c0050c00c6d56c00b0050b00b6d56b0000000000000000000000000
+0000000000000000000cc000000cc00003bbbb5555bbbb3003bbbb5555bbbb3000a99a00060500600605c060060500600605c060000000000000000000000000
+00000000000000000000c0000000c000003b33555533b300003b33555533b3000090090006500060065cc06006500060065cc060000000000000000000000000
 00000000000000000000000000000000000033333333000000003333333300000000000000000000000000000000000000000000000000000000000000000000
 01111110000000000000000000000000001111111111110000111111111111000000000000000000000000000000000000000000000000000000000000000000
 01cccc10000000000000000000000000013551111115531001355111111553100000000000000000000000000000000000000000000000000000000000000000
