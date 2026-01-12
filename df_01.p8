@@ -74,7 +74,7 @@ function init_vars()
 		dir = 0,
 		walk_ani = 0,  
 		walk_max = 16,
-		safe = false,
+		safe = true,
 	}
 	
 	en_side = {}
@@ -92,6 +92,15 @@ function init_vars()
 		shot_timer = 0,
 	}
 	en_top_shots = {}
+	
+	top_goals = { 
+		safe_x = 100, 
+		safe_y = 150, 
+		made = false,
+		comp = false,
+		goal_x =  15,
+		goal_y = 220,
+	}
 		
 	pickups_top = {}
 	
@@ -387,7 +396,16 @@ function top_reset()
 		dir = 0,
 		walk_ani = 0,  
 		walk_max = 16,
-		safe = false,
+		safe = true,
+	}
+	
+	top_goals = { 
+		safe_x = 100, 
+		safe_y = 150, 
+		made = false,
+		comp = false,
+		goal_x = 15,
+		goal_y = 220,
 	}
 	
 	en_top = { 
@@ -518,6 +536,14 @@ function player_top_death_draw(ani)
 	if(ani > 12 and ani <= 16) then spr(10, player_top.x, player_top.y) end
 end
 
+function player_top_check_safe()
+	if(top_goals.safe_x + 8 > player_top.x) and (top_goals.safe_x < player_top.x + 6) and (top_goals.safe_y + 8> player_top.y) and (top_goals.safe_y < player_top.y + 9) then 
+		player_top.safe = true
+	else
+		player_top.safe = false
+	end
+end
+
 function pickups_top_generate()
 	local tx_min = 1
 	local tx_max = 14
@@ -595,6 +621,26 @@ function blocks_top_generate()
 			mset(new_x, new_y, 96)
 			add(blocks_top, { x = new_x, y = new_y })
 		end
+	end
+end
+
+function goals_draw() 
+	-- 25 = empty safe
+	-- 26 == player + safe
+	-- 27 == empty goal
+	-- 28 == player + goal
+	local goalspr = 25
+	local madespr = 27
+		
+	if(player_top.safe == true) then goalspr = 26 end
+	spr(goalspr, top_goals.safe_x, top_goals.safe_y)
+	
+	if(top_goals.made == true) then
+		if(top_goals.goal_x + 8 > player_top.x) and (top_goals.goal_x < player_top.x + 6) and (top_goals.goal_y + 8> player_top.y) and (top_goals.goal_y < player_top.y + 9) then 
+			madespr = 28
+			top_goals.comp = true
+		end
+		spr(madespr, top_goals.goal_x, top_goals.goal_y)
 	end
 end
 
@@ -676,7 +722,7 @@ function en_top_shots_update()
 		local pl_x = player_top.x
 		local pl_y = player_top.y
 		
-		if(en_x + 8 > pl_x) and (en_x < pl_x + 6) and (en_y + 8> pl_y) and (en_y < pl_y + 9) then 
+		if(en_x + 8 > pl_x) and (en_x < pl_x + 6) and (en_y + 8> pl_y) and (en_y < pl_y + 9) and (player_top.safe == false) then 
 			deli(en_top_shots, i)
 			if (debug_top_en == false) then
 				state_switch(game_states.top_death)
@@ -789,7 +835,7 @@ gamestate = {
 		draw = function(self)
 			cls()
 			map()
-			camera(player_side.x - 64, player_side.y - 64)
+			camera(player_side.x - 64, 0)
 			player_side_draw()
 			en_side_draw()
 			
@@ -816,7 +862,7 @@ gamestate = {
 		draw = function(self)
 			cls()
 			map()
-			camera(player_side.x - 64, player_side.y - 64)
+			camera(player_side.x - 64, 0)
 			player_side_death_draw(self.pl)
 			en_side_draw()
 			
@@ -842,7 +888,7 @@ gamestate = {
 		draw = function(self)
 			cls()
 			map()
-			camera(player_side.x - 64, player_side.y - 64)
+			camera(player_side.x - 64, 0)
 			
 			if(self.i >= 0 and self.i < 4) then spr(80, 0, 104) end
 			if(self.i > 5 and self.i <= 8) then spr(81, 0, 104) end
@@ -865,10 +911,16 @@ gamestate = {
 			player_top_control()
 			pickups_top_collision()
 			
+			player_top_check_safe()
+			
 			en_top_control()
 			en_top_shots_update()
 			
 			if(#pickups_top <= 0) then
+				top_goals.made = true
+			end
+			
+			if(top_goals.comp == true) then
 				state_switch(game_states.top_win)
 			end
 		end,
@@ -878,7 +930,9 @@ gamestate = {
 			camera(0, 128)
 			map(0, 15, 0, 128, 16, 16)
 			pickups_top_draw()
-			player_top_draw()
+			if(player_top.safe == false) then player_top_draw() end
+			goals_draw()
+			
 			en_top_draw()
 			en_top_shots_draw()
 			
@@ -934,7 +988,7 @@ gamestate = {
 			camera(0, 128)
 			map(0, 15, 0, 128, 16, 16)
 			pickups_top_draw()
-			player_top_draw()
+			goals_draw()
 		end,
 	}
 }
