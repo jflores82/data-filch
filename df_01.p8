@@ -68,8 +68,8 @@ function init_vars()
 	}
 	
 	player_top = { 
-		x = 100, 
-		y = 150,
+		x = 96, 
+		y = 144,
 		flip = false,
 		dir = 0,
 		walk_ani = 0,  
@@ -94,12 +94,12 @@ function init_vars()
 	en_top_shots = {}
 	
 	top_goals = { 
-		safe_x = 100, 
-		safe_y = 150, 
+		safe_x = 96, 
+		safe_y = 144, 
 		made = false,
 		comp = false,
-		goal_x =  15,
-		goal_y = 220,
+		goal_x =  23,
+		goal_y = 208,
 	}
 		
 	pickups_top = {}
@@ -390,8 +390,8 @@ end
 
 function top_reset() 
 	player_top = { 
-		x = 100, 
-		y = 150,
+		x = 96, 
+		y = 144,
 		flip = false,
 		dir = 0,
 		walk_ani = 0,  
@@ -400,12 +400,12 @@ function top_reset()
 	}
 	
 	top_goals = { 
-		safe_x = 100, 
-		safe_y = 150, 
+		safe_x = 96, 
+		safe_y = 144, 
 		made = false,
 		comp = false,
-		goal_x = 15,
-		goal_y = 220,
+		goal_x = 23,
+		goal_y = 208,
 	}
 	
 	en_top = { 
@@ -560,7 +560,11 @@ function pickups_top_generate()
 			new_y = flr(rnd(ty_max - ty_min + 1)) + ty_min
 		
 			if not tile_solid(new_x, new_y) then
-				valid = true
+				if not ((new_x > 96) and (new_x < 104) and (new_y > 144) and (new_y < 152)) then
+					if not ( (new_x > 23) and (new_x < 32) and (new_y > 288) and (new_y < 296) ) then
+						valid = true
+					end
+				end
 			end
 		until valid
 	
@@ -613,7 +617,11 @@ function blocks_top_generate()
 			new_y = flr(rnd(ty_max - ty_min + 1)) + ty_min
 		
 			if not tile_solid(new_x, new_y) then
-				valid = true
+				if not ((new_x > 96) and (new_x < 104) and (new_y > 144) and (new_y < 152)) then
+					if not ( (new_x > 23) and (new_x < 32) and (new_y > 288) and (new_y < 296) ) then
+						valid = true
+					end
+				end
 			end
 		until valid
 	
@@ -935,7 +943,6 @@ gamestate = {
 			
 			en_top_draw()
 			en_top_shots_draw()
-			
 			
 			print_echoes(7, 10, 150)
 			if(debug_top_en == true) then
