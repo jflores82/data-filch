@@ -125,7 +125,9 @@ function init_vars()
 		top_play = 5, 
 		top_death = 6,
 		top_win = 7,
-		gameover = 8
+		gameover = 8,
+		mainmenu = 9, 
+		options = 10,
 	}
 	currentstate = 1
 	
@@ -824,7 +826,7 @@ gamestate = {
 			if(self.i >= 20) then self.i = 0 end
 			
 			if(btnp(4)) then
-				state_switch(game_states.side_play)
+				state_switch(game_states.mainmenu)
 			end
 		end,
 		
@@ -1033,6 +1035,69 @@ gamestate = {
 			print("game over yeah!", 35, 30, 7)
 			print("press 🅾️ / z", 35, 100, 7)
 			print("final score:"..player_general.score, 35, 50, 10)
+		end,
+	},
+	[9] = { -- main menu 
+		enter = function(self)
+			self.i = 0 
+		end,
+		
+		update = function(self)
+			if(btnp(3)) and (self.i < 1) then 
+				self.i += 1
+			end
+			if(btnp(2)) and (self. i > 0) then
+				self.i -= 1
+			end
+			
+			if(btnp(4)) then
+				if(self.i == 0) then state_switch(game_states.side_play) end
+				if(self.i == 1) then state_switch(game_states.options) end
+			end
+		end,
+				
+		draw = function(self)
+			local y = 50
+			local ychr = y + (self.i * 8)
+			cls()
+			print("start game", 46, y, 7)
+			print("options", 46, y + 8, 7) 
+			
+			print(chr(23), 38, ychr, 10)
+		end,
+	},
+	[10] = { -- options
+		enter = function(self)
+			self.i = 0
+			self.imax = 3
+		end,
+		
+		update = function(self) 
+			if(btnp(3)) and (self.i < (self.imax -1)) then 
+				self.i += 1
+			end
+			if(btnp(2)) and (self. i > 0) then
+				self.i -= 1
+			end
+			
+			if(btnp(4)) then
+				if(self.i == 2) then state_switch(game_states.title_screen) end
+			end
+		end,
+		
+		draw = function(self)
+			local y = 50
+			local ychr = y + (self.i * 8)
+			
+			cls()
+			print("options", 54, 20, 11)
+			
+			print("option 1:", 42, y, 7)
+			print("option 2:", 42, y+8, 7)
+			print("exit", 42, y+16, 7)
+			
+			print(chr(23), 35, ychr, 12)
+			
 		end,
 	}
 }
