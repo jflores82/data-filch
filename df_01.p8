@@ -67,6 +67,11 @@ function init_vars()
 		gvt = 0,
 	}
 	
+	player_general = { 
+		score = 0,
+		lives = 3,
+	}
+	
 	player_top = { 
 		x = 96, 
 		y = 144,
@@ -519,6 +524,13 @@ function player_top_check_safe()
 	end
 end
 
+function player_death_check()
+	player_general.lives -= 1
+	if(player_general.lives <= 0) then 
+		state_switch(game_states.gameover)
+	end
+end
+
 function pickups_top_generate()
 	local tx_min = 1
 	local tx_max = 14
@@ -572,6 +584,7 @@ function pickups_top_collision()
 		
 		if(en_x + 8 > pl_x) and (en_x < pl_x + 6) and (en_y + 8> pl_y) and (en_y < pl_y + 9) then 
 			deli(pickups_top, i)
+			player_general.score += 10
 		end
 	end
 end
@@ -810,7 +823,7 @@ gamestate = {
 			self.i += 1 
 			if(self.i >= 20) then self.i = 0 end
 			
-			if(btn(4)) then
+			if(btnp(4)) then
 				state_switch(game_states.side_play)
 			end
 		end,
@@ -846,7 +859,7 @@ gamestate = {
 			camera(player_side.x - 64, 0)
 			player_side_draw()
 			en_side_draw()
-			
+			print("lives:"..player_general.lives, player_side.x - 54, 10, 7)
 			if(debug_side_en == true) then 
 				debug_side() 
 			end
@@ -862,8 +875,11 @@ gamestate = {
 		update = function(self)
 			self.pl += 1
 			if(self.pl > 50) then
-				side_reset()
-				state_switch(game_states.side_play)
+				player_death_check()
+				if(player_general.lives > 0) then 
+					side_reset()
+					state_switch(game_states.side_play)
+				end
 			end
 		end,
 	
@@ -960,6 +976,7 @@ gamestate = {
 		update = function(self) 
 			self.pl += 1
 			if(self.pl > 50) then
+				player_death_check()
 				top_reset()
 				state_switch(game_states.top_play)
 			end
@@ -996,6 +1013,26 @@ gamestate = {
 			map(0, 15, 0, 128, 16, 16)
 			pickups_top_draw()
 			goals_draw()
+		end,
+	},
+	[8] = { -- gameover 
+		enter = function(self)
+		
+		end,
+		
+		update = function(self)
+			if(btn(4)) then
+				init_vars()
+				state_switch(game_states.title_screen)
+			end
+		end,
+		
+		draw = function(self)
+			cls()
+			camera()
+			print("game over yeah!", 35, 30, 7)
+			print("press 🅾️ / z", 35, 100, 7)
+			print("final score:"..player_general.score, 35, 50, 10)
 		end,
 	}
 }
