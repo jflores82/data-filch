@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
---dragon_fire_clone
+--Data Filch
 --by tibonev
 
 -- debug -- REMEMBER TO DISABLE BEFORE RELEASE --
@@ -70,6 +70,8 @@ function init_vars()
 	player_general = { 
 		score = 0,
 		lives = 3,
+		music = 1,
+		sfx = 1
 	}
 	
 	player_top = { 
@@ -1083,6 +1085,16 @@ gamestate = {
 			if(btnp(4)) then
 				if(self.i == 2) then state_switch(game_states.title_screen) end
 			end
+			
+			if(btnp(0)) then
+				if(self.i == 0) then player_general.music = 0 end
+				if(self.i == 1) then player_general.sfx = 0 end
+			end
+			
+			if(btnp(1)) then
+				if(self.i == 0) then player_general.music = 1 end
+				if(self.i == 1) then player_general.sfx = 1 end
+			end
 		end,
 		
 		draw = function(self)
@@ -1092,11 +1104,23 @@ gamestate = {
 			cls()
 			print("options", 54, 20, 11)
 			
-			print("option 1:", 42, y, 7)
-			print("option 2:", 42, y+8, 7)
+			print("music", 42, y, 7)
+			print("sfx", 42, y+8, 7)
 			print("exit", 42, y+16, 7)
 			
 			print(chr(23), 35, ychr, 12)
+			
+			if(player_general.music == 1) then 
+				print("on", 70, y, 11)
+			else 
+				print("off", 70, y, 10)
+			end
+			
+			if(player_general.sfx == 1) then
+				print("on", 70, y+8, 11)
+			else	
+				print("off", 70, y+8, 10)
+			end
 			
 		end,
 	}
