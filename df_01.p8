@@ -126,6 +126,8 @@ function init_vars()
 		gameover = 8,
 		mainmenu = 9, 
 		options = 10,
+		tutorial = 11,
+		credits = 12,
 	}
 	currentstate = 1
 	currentlevel = 1
@@ -932,7 +934,6 @@ gamestate = {
 			en_side_draw()
 			side_hud_draw()
 			
-			print("c:"..player_general.d_cooldown, player_side.x - 54, 10, 7)
 			if(debug_side_en == true) then 
 				debug_side() 
 			end
@@ -1117,7 +1118,7 @@ gamestate = {
 		end,
 		
 		update = function(self)
-			if(btnp(3)) and (self.i < 1) then 
+			if(btnp(3)) and (self.i < 2) then 
 				self.i += 1
 			end
 			if(btnp(2)) and (self. i > 0) then
@@ -1127,6 +1128,7 @@ gamestate = {
 			if(btnp(4)) then
 				if(self.i == 0) then state_switch(game_states.side_play) end
 				if(self.i == 1) then state_switch(game_states.options) end
+				if(self.i == 2) then state_switch(game_states.tutorial) end
 			end
 		end,
 				
@@ -1136,6 +1138,7 @@ gamestate = {
 			cls()
 			print("start game", 46, y, 7)
 			print("options", 46, y + 8, 7) 
+			print("instructions", 46, y+16, 7)
 			
 			print(chr(23), 38, ychr, 10)
 		end,
@@ -1143,7 +1146,7 @@ gamestate = {
 	[10] = { -- options
 		enter = function(self)
 			self.i = 0
-			self.imax = 3
+			self.imax = 4
 		end,
 		
 		update = function(self) 
@@ -1155,7 +1158,8 @@ gamestate = {
 			end
 			
 			if(btnp(4)) then
-				if(self.i == 2) then state_switch(game_states.title_screen) end
+				if(self.i == 2) then state_switch(game_states.credits) end
+				if(self.i == 3) then state_switch(game_states.mainmenu) end
 			end
 			
 			if(btnp(0)) then
@@ -1178,7 +1182,8 @@ gamestate = {
 			
 			print("music", 42, y, 7)
 			print("sfx", 42, y+8, 7)
-			print("exit", 42, y+16, 7)
+			print("credits", 42, y+16, 7)
+			print("exit", 42, y+24, 7)
 			
 			print(chr(23), 35, ychr, 12)
 			
@@ -1193,6 +1198,103 @@ gamestate = {
 			else	
 				print("off", 70, y+8, 10)
 			end
+			
+		end,
+	},
+	[11] = { -- instructions 
+		enter = function(self)
+			self.i = 0
+			self.j = 0
+		end,
+		
+		update = function(self)
+			self.j += 1 
+			if(self.j > 20) then self.j = 0 end
+			
+			if(btnp(4)) then self.i += 1 end
+			if(self.i >= 3) then 
+				state_switch(game_states.mainmenu)
+			end
+			
+			if(btnp(5)) then state_switch(game_states.mainmenu) end
+		end, 
+		
+		draw = function(self)
+			cls()
+			local y = 10
+			if(self.i == 0) then 
+				print("instructions", 25,y,8)
+				print("the game is divided in 2 parts:", 0, y + (8*2), 7)
+				print("sidescroll and top down sections", 0, y + (8*3), 7) 
+				print("each part has unique controls", 0, y + (8*5), 7)
+				print("and scoring systems.", 0, y + (8*6), 7)
+				print(chr(142), 120, 120, 11)
+			end
+			
+			if(self.i == 1) then
+				print("controls system:", 25, y, 8)
+				print("sidescroll:", 1, y + (8*2), 11)
+				print(chr(139).." and "..chr(145)..":", 1, y + (8*3), 7)
+				print("walk", 42, y + (8*3), 11)
+				print(chr(131)..":",1 , y + (8*4), 7)
+				print("crouch", 15, y + (8*4), 11)
+				print(chr(142)..":", 1, y + (8*5), 7)
+				print("jump", 15, y + (8*5), 11)
+				
+				print("topdown:", 1, y + (8*7), 11)
+				print(chr(148).." "..chr(131).." "..chr(139).." "..chr(145)..":", 1, y + (8*8), 7)
+				print("move", 50, y + (8*8), 11)
+				spr(25, 1, y + (8*9))
+				print(": safe capsule", 10, y + (8*9), 7)
+				print(chr(142), 120, 120, 11)
+			end
+			
+			if(self.i == 2) then
+				print("scoring system:", 25, y, 8)
+				print("sidescroll:", 1, y + (8*2), 11)
+				print("gain points by walking right", 1, y + (8*3), 7)
+				print("lose points by walking left", 1, y + (8*4), 7)
+				print("near misses for multipliers", 1, y + (8*5), 7)
+				print("indicated by the d value", 1, y + (8*6), 7)
+			
+				print("topdown:", 1, y + (8*8), 11)
+				spr(32, 1, y + (8*9))
+				print(": collect for points", 10, y + (8*9), 7)
+				
+				if(self.j > 10) then print("extra live every 30000 points", 1, y+(8*12), 10) end
+				print(chr(142), 120, 120, 11)
+			end
+		end,
+	},
+	[12] = { 
+		enter = function(self)
+			self.i = 0
+		end,
+		
+		update = function(self)
+			if(btnp(4) or btnp(5)) then state_switch(game_states.options) end
+			
+			self.i += 1
+			if(self.i >= 20) then self.i = 0 end
+			
+		end, 
+		
+		draw = function(self)
+			local y = 10
+			cls()
+			print("credits", 25, y, 13)
+			print("game created by", 1, y + (8*2), 7) 
+			print("tibonev", 65, y + (8*2), 2)
+			print("date: january 2026", 1, y + (8*3), 7)
+			print("no ai of any kind was used", 1, y + (8*4), 7)
+			print("visit:", 1, y + (8*6), 7)
+			print("classicgames.com.br", 40, y + (8*6), 13)
+			
+			if(self.i > 10) then
+				print("keep art and games human!", 15, y + (8*10), 8)
+			end
+			
+			print("press any key", 35, y + (8*13), 11)
 			
 		end,
 	}
