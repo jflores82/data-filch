@@ -71,12 +71,16 @@ function init_vars()
 		score = 0,
 		lives = 3,
 		music = 1,
-		sfx = 1
+		sfx = 1,
+		d = 0,
+		d_max = 4,
+		d_cooldown = 0,
+		d_cooldown_max = 30,
 	}
 	
 	player_top = { 
 		x = 96, 
-		y = 144,
+		y = 152,
 		flip = false,
 		dir = 0,
 		walk_ani = 0,  
@@ -100,7 +104,7 @@ function init_vars()
 	
 	top_goals = { 
 		safe_x = 96, 
-		safe_y = 144, 
+		safe_y = 152, 
 		made = false,
 		comp = false,
 		goal_x =  23,
@@ -134,12 +138,17 @@ function init_vars()
 			en_top_spd_delta = 0.1,
 			en_top_shot_spd = 1,
 			pickups = 5,
-		}
-	}
-	
-	--DEBUG REMOVE BEFORE RELEASE --
-	--top_reset(1)
+		},
+		[2] = { 
+			en_side_spd_min = 0.6,
+			en_side_spd_max = 1.1,
+			en_top_spd_max = 1.1,
+			en_top_spd_delta = 0.1,
+			en_top_shot_spd = 1,
+			pickups = 5,
+		},
 		
+	}
 end
 
 function side_reset()
@@ -156,6 +165,9 @@ function side_reset()
 		walk_max = 8,
 		gvt = 0,
 	}
+	
+	player_general.d = 0
+	player_general.d_cooldown = 0
 	en_side = {}
 end
 
@@ -168,6 +180,7 @@ function player_side_control()
 			player_side.flip = false
 			player_side.x -= 1
 			player_side.walk_ani += 1
+			player_side_score()
 		end
 	end
 	if (btn(1) and player_side.crouch == false) then -- go right --
@@ -177,6 +190,8 @@ function player_side_control()
 			player_side.flip = true
 			player_side.x += 1
 			player_side.walk_ani += 1
+			player_general.score -= 1
+			if(player_general.score <= 0) then player_general.score = 0 end
 		end
 	end
 	if (not btn(0)) and (not btn(1)) then -- not walking --
@@ -230,6 +245,12 @@ function player_side_control()
 	end
 	
 	if(player_side.gvt == 1) then player_side.y += 1 end
+	
+	if(player_general.d_cooldown > 0) then player_general.d_cooldown += 1 end
+	if(player_general.d_cooldown >= player_general.d_cooldown_max) then 
+		player_general.d_cooldown = 0 
+		player_general.d = 0
+	end
 
 end
 
@@ -287,6 +308,24 @@ function player_side_collision(plx, ply, dir, flag)
 	end
 	
 	return false 
+end
+
+function player_side_score()
+	for i = #en_side, 1, -1 do
+		if((abs(en_side[i].x - player_side.x) < 16) and player_side.jump == false) then
+			if(player_general.d_cooldown > 0) then 
+				player_general.d += 1
+				if(player_general.d >= player_general.d_max) then player_general.d = player_general.d_max end
+				break
+			end
+			if(player_general.d_cooldown == 0) then player_general.d_cooldown = 1 end
+		end
+	end
+	if(player_general.d * 1) > 0 then
+		player_general.score += (1 * player_general.d)
+	else 
+		player_general.score += 1
+	end
 end
 
 function player_side_death_draw(ani)
@@ -390,8 +429,6 @@ function top_reset(new)
 		ani = 0,
 		ani_max = 8, 
 		move = false, 
-		max_spd = 1,
-		spd_delta = 0.1,
 		spd = 0,
 		bit = 1,
 		shot_delay = 30,
@@ -537,7 +574,7 @@ end
 function pickups_top_generate()
 	local tx_min = 1
 	local tx_max = 14
-	local ty_min = 17
+	local ty_min = 18
 	local ty_max = 28
 	local new_x = flr(rnd(tx_max - tx_min + 1)) + tx_min
 	local new_y = flr(rnd(ty_max - ty_min + 1)) + ty_min
@@ -595,7 +632,7 @@ end
 function blocks_top_generate()
 	local tx_min = 1
 	local tx_max = 14
-	local ty_min = 17
+	local ty_min = 18
 	local ty_max = 28
 	local new_x = flr(rnd(tx_max - tx_min + 1)) + tx_min
 	local new_y = flr(rnd(ty_max - ty_min + 1)) + ty_min
@@ -749,6 +786,37 @@ function en_top_shots_draw()
 	end
 end
 
+------------------------------
+-- HUD -----------------------
+------------------------------
+function side_hud_draw()
+	-- Lives --
+	print("l:", (player_side.x - 63), 122, 7)
+	for i = 1, player_general.lives, 1 do
+		print(chr(137), (player_side.x - 62) + (i * 8), 122, 7)
+	end
+	
+	-- Score -- 
+	print ("s:"..player_general.score, player_side.x, 122, 7)
+
+	-- Danger Move --
+	print ("d:"..player_general.d, player_side.x + 30, 122, 7)
+end
+
+function top_hud_draw()
+	-- Lives --
+	print("l:", 1, 128, 7)
+	for i = 1, player_general.lives, 1 do
+		print(chr(137), 2 + (i * 8), 128, 7)
+	end
+	
+	-- Score --
+	print ("s:"..player_general.score, 64, 128, 7)
+	
+	-- Danger Move -- 
+	print ("d:"..player_general.d, 110, 128, 7)
+end
+	
 
 ------------------------------
 -- General / Misc Functions --
@@ -862,7 +930,9 @@ gamestate = {
 			camera(player_side.x - 64, 0)
 			player_side_draw()
 			en_side_draw()
-			print("lives:"..player_general.lives, player_side.x - 54, 10, 7)
+			side_hud_draw()
+			
+			print("c:"..player_general.d_cooldown, player_side.x - 54, 10, 7)
 			if(debug_side_en == true) then 
 				debug_side() 
 			end
@@ -963,6 +1033,8 @@ gamestate = {
 			en_top_draw()
 			en_top_shots_draw()
 			
+			top_hud_draw()
+			
 			print_echoes(7, 10, 150)
 			if(debug_top_en == true) then
 				--rect(8, 136, 119, 248, 12)  -- Your target area
@@ -1004,7 +1076,8 @@ gamestate = {
 		
 		update = function(self) 
 			self.i += 1
-			if(self.i >= 60) then 
+			if(self.i >= 60) then
+				if(currentlevel < 11) then currentlevel += 1 end
 				side_reset()
 				state_switch(game_states.side_play) 
 			end
@@ -1212,9 +1285,9 @@ __map__
 4100000000007f7f7f0000000000ff7f0000000000004041000000007f7f7f000000000000000000000000000000000000000000000000000000000000000000000041414100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ff
 5000000000007f7f7f7f000000007f7f00000000004041000000000000007f000000000000000000000000000000000000000000000000000000000000000000000041410000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ff
 4041404040404040404040404040404041404040404040404040404040404041404040404040404040404040404041404040404040404040404040404041404040404041ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-4040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404040404100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-6000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-6000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+6060606060606060606060606060606000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+60ffffffffffffffffffffffffffff6000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 60000000000000000000ff000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 6000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 60000000000000ff000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
