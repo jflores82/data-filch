@@ -91,8 +91,6 @@ function init_vars()
 		ani = 0,
 		ani_max = 8, 
 		move = false, 
-		max_spd = 1,
-		spd_delta = 0.1,
 		spd = 0,
 		bit = 1,
 		shot_delay = 30,
@@ -110,12 +108,6 @@ function init_vars()
 	}
 		
 	pickups_top = {}
-	
-	level_top = { 
-		en_top_speed = 1,
-		en_top_spddif = 0.1,
-		pickups = 5,
-	}
 	blocks_top = {}
 	
 	game_states = { 
@@ -132,6 +124,18 @@ function init_vars()
 		options = 10,
 	}
 	currentstate = 1
+	currentlevel = 1
+	
+	levels = { 
+		[1] = { 
+			en_side_spd_min = 0.5,
+			en_side_spd_max = 1,
+			en_top_spd_max = 1,
+			en_top_spd_delta = 0.1,
+			en_top_shot_spd = 1,
+			pickups = 5,
+		}
+	}
 	
 	--DEBUG REMOVE BEFORE RELEASE --
 	--top_reset(1)
@@ -300,10 +304,10 @@ function en_side_update()
 		
 	if(count(en_side) < 2) then
 		if(flr(rnd(20)) == 10) then
-			add(en_side, {x = camx + 1, y = player_side.y + 2, type = 1, spd = 1.0, anim = 0})
+			add(en_side, {x = camx + 1, y = player_side.y + 2, type = 1, spd = levels[currentlevel].en_side_spd_max, anim = 0})
 		end
 		if(flr(rnd(20)) == 5) then 
-			add(en_side, {x = camx + 1, y = player_side.y - 4, type = 2, spd = 0.5, anim = 0})
+			add(en_side, {x = camx + 1, y = player_side.y - 4, type = 2, spd = levels[currentlevel].en_side_spd_min, anim = 0})
 		end
 	end
 	
@@ -396,11 +400,6 @@ function top_reset(new)
 	en_top_shots = {}
 	
 	if(new == 1) then 
-		level_top = { 
-			en_top_speed = 1,
-			en_top_spddif = 0.1,
-			pickups = 5,
-		}
 		pickups_top = {}
 		blocks_top = {}
 		blocks_top_generate()
@@ -543,7 +542,7 @@ function pickups_top_generate()
 	local new_x = flr(rnd(tx_max - tx_min + 1)) + tx_min
 	local new_y = flr(rnd(ty_max - ty_min + 1)) + ty_min
 		
-	for i = 1, level_top.pickups, 1 do
+	for i = 1, levels[currentlevel].pickups, 1 do
 		local valid = false
 		
 		repeat
@@ -659,15 +658,15 @@ function en_top_control()
 		en_top.move = false
 		
 		if(en_top.x < player_top.x + 8) then
-			en_top.spd += en_top.spd_delta
+			en_top.spd += levels[currentlevel].en_top_spd_delta
 			en_top_calculate_shot(1)
-			if(en_top.spd >= en_top.max_spd) then en_top.spd = en_top.max_spd end
+			if(en_top.spd >= levels[currentlevel].en_top_spd_max) then en_top.spd = levels[currentlevel].en_top_spd_max end
 		end
 		
 		if(en_top.x > player_top.x - 12) then
-			en_top.spd -= en_top.spd_delta
+			en_top.spd -= levels[currentlevel].en_top_spd_delta
 			en_top_calculate_shot(0)
-			if(en_top.spd <= (en_top.max_spd * -1)) then en_top.spd = (en_top.max_spd * - 1) end
+			if(en_top.spd <= (levels[currentlevel].en_top_spd_max * -1)) then en_top.spd = (levels[currentlevel].en_top_spd_max * - 1) end
 		end
 		
 		if(en_top.x <= 8) then 
@@ -715,7 +714,7 @@ end
 
 function en_top_shots_update()
 	for i = #en_top_shots, 1, -1 do
-		en_top_shots[i].y -= 1
+		en_top_shots[i].y -= levels[currentlevel].en_top_shot_spd
 		
 		local en_x = en_top_shots[i].x
 		local en_y = en_top_shots[i].y
