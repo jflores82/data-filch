@@ -451,7 +451,7 @@ function player_top_control()
 	if (btn(0)) then -- go left --
 		local move_l = true
 		for i = 0, 7, 1 do
-			local x = flr((player_top.x - 1) / 8)
+			local x = flr((player_top.x) / 8)
 			local y = flr((player_top.y - 8 + i) / 8)
 			if(tile_solid(x, y)) then
 				move_l = false
@@ -468,7 +468,7 @@ function player_top_control()
 	if (btn(1)) then -- go right --
 		local move_r = true
 		for i = 0, 7, 1 do
-			local x = flr((player_top.x + 9) / 8)
+			local x = flr((player_top.x + 7) / 8)
 			local y = flr((player_top.y - 8 + i) / 8)
 			if(tile_solid(x, y)) then
 				move_r = false
