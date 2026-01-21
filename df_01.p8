@@ -463,12 +463,16 @@ function side_rain_draw()
 	player_side.rain += 1
 	if(player_side.rain >= 15) then player_side.rain = 0 end
 	
+	local flip = false 
+	
+	if(currentlevel % 2 == 0) then flip = true end
+	
 	local rainspr = 72
 		
 	for x = (player_side.x - 64), (player_side.x + 64), 8 do
 		for y = 0, 115, 8 do
 			if(player_side.rain > 5) then rainspr = 73 end
-			spr(rainspr, x, y)
+			spr(rainspr, x, y,1,1, flip)
 		end
 	end
 end
