@@ -150,6 +150,62 @@ function init_vars()
 			en_top_shot_spd = 1,
 			pickups = 5,
 		},
+		[3] = { 
+			en_side_spd_min = 0.7,
+			en_side_spd_max = 1.2,
+			en_top_spd_max = 1.2,
+			en_top_spd_delta = 0.2,
+			en_top_shot_spd = 1.1,
+			pickups = 5,
+		},
+		[4] = { 
+			en_side_spd_min = 0.8,
+			en_side_spd_max = 1.2,
+			en_top_spd_max = 1.2,
+			en_top_spd_delta = 0.3,
+			en_top_shot_spd = 1.2,
+			pickups = 6,
+		},
+		[5] = { 
+			en_side_spd_min = 0.9,
+			en_side_spd_max = 1.3,
+			en_top_spd_max = 1.3,
+			en_top_spd_delta = 0.4,
+			en_top_shot_spd = 1.3,
+			pickups = 6,
+		},
+		[6] = { 
+			en_side_spd_min = 0.9,
+			en_side_spd_max = 1.4,
+			en_top_spd_max = 1.4,
+			en_top_spd_delta = 0.5,
+			en_top_shot_spd = 1.3,
+			pickups = 6,
+		},
+		[7] = { 
+			en_side_spd_min = 1.0,
+			en_side_spd_max = 1.4,
+			en_top_spd_max = 1.5,
+			en_top_spd_delta = 0.5,
+			en_top_shot_spd = 1.4,
+			pickups = 7,
+		},
+		[8] = { 
+			en_side_spd_min = 1.0,
+			en_side_spd_max = 1.5,
+			en_top_spd_max = 1.6,
+			en_top_spd_delta = 0.6,
+			en_top_shot_spd = 1.5,
+			pickups = 8,
+		},
+		[9] = { 
+			en_side_spd_min = 1.0,
+			en_side_spd_max = 1.5,
+			en_top_spd_max = 1.6,
+			en_top_spd_delta = 0.7,
+			en_top_shot_spd = 1.5,
+			pickups = 10,
+		},
 		
 	}
 end
@@ -1096,7 +1152,7 @@ gamestate = {
 		update = function(self) 
 			self.i += 1
 			if(self.i >= 60) then
-				if(currentlevel < 11) then currentlevel += 1 end
+				if(currentlevel < 9) then currentlevel += 1 end
 				side_reset()
 				state_switch(game_states.side_play) 
 			end
