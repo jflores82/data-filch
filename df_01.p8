@@ -237,6 +237,7 @@ function player_side_control()
 	
 	if(btnp(4) and player_side.jump == false and player_side.crouch == false and player_side.gvt == 0) then -- jump
 		player_side.jump = true
+		sfx_play(01)
 		player_side.jump_counter = 1
 	end
 	
@@ -288,6 +289,7 @@ function player_side_draw()
 	-- player is walking
 	if(player_side.walk_ani > 0 and player_side.walk_ani < 4) then
 		playerspr = 1
+		if(player_side.jump == false) then sfx_play(5) end
 	else 
 		playerspr = 0
 	end
@@ -577,26 +579,44 @@ function player_top_draw()
 	
 	if(player_top.dir == 0 or player_top.dir == 1) then
 		if(player_top.walk_ani == 0) then playerspr = 0 end
-		if(player_top.walk_ani > 0 and player_top.walk_ani < 3) then playerspr = 1 end
+		if(player_top.walk_ani > 0 and player_top.walk_ani < 3) then 
+			playerspr = 1
+			sfx_play(5)
+		end
 		if(player_top.walk_ani >= 3 and player_top.walk_ani < 8) then playerspr = 0 end
-		if(player_top.walk_ani >= 8 and player_top.walk_ani < 12) then playerspr = 1 end
+		if(player_top.walk_ani >= 8 and player_top.walk_ani < 12) then 
+			playerspr = 1
+			sfx_play(5)
+		end
 		if(player_top.walk_ani >= 12 and player_top.walk_ani < 16) then playerspr = 0 end
 	end
 	
 	
 	if(player_top.dir == 2) then 
 		if(player_top.walk_ani == 0) then playerspr = 14 end
-		if(player_top.walk_ani > 0 and player_top.walk_ani < 3) then playerspr = 15 end
+		if(player_top.walk_ani > 0 and player_top.walk_ani < 3) then 
+			playerspr = 15 
+			sfx_play(5)
+		end
 		if(player_top.walk_ani >= 3 and player_top.walk_ani < 8) then playerspr = 14 end
-		if(player_top.walk_ani >= 8 and player_top.walk_ani < 12) then playerspr = 19 end
+		if(player_top.walk_ani >= 8 and player_top.walk_ani < 12) then 
+			playerspr = 19 
+			sfx_play(5)
+		end
 		if(player_top.walk_ani >= 12 and player_top.walk_ani < 16) then playerspr = 14 end
 	end
 	
 	if(player_top.dir == 3) then 
 		if(player_top.walk_ani == 0) then playerspr = 12 end
-		if(player_top.walk_ani > 0 and player_top.walk_ani < 3) then playerspr = 13 end
+		if(player_top.walk_ani > 0 and player_top.walk_ani < 3) then 
+			playerspr = 13 
+			sfx_play(5)
+		end
 		if(player_top.walk_ani >= 3 and player_top.walk_ani < 8) then playerspr = 12 end
-		if(player_top.walk_ani >= 8 and player_top.walk_ani < 12) then playerspr = 18 end
+		if(player_top.walk_ani >= 8 and player_top.walk_ani < 12) then 
+			playerspr = 18 
+			sfx_play(5)
+		end
 		if(player_top.walk_ani >= 12 and player_top.walk_ani < 16) then playerspr = 12 end
 	end
 		
@@ -799,6 +819,7 @@ end
 function en_top_create_shot()
 	if(#en_top_shots < 3) and (en_top.shot_timer == 0) and (player_top.safe == false) then
 		add(en_top_shots, {x = en_top.x + 6, y = en_top.y - 8})
+		sfx_play(7)
 		en_top.shot_timer = 1
 	end
 end
@@ -879,6 +900,24 @@ function tile_solid(tx,ty, flag)
 	flag = flag or 0
 	local t = mget(tx, ty)
 	return fget(t, flag)
+end
+
+function sfx_play(sfxi)
+	sfxi = sfxi or 0
+	if(player_general.sfx == 1) then
+		sfx(sfxi)
+	end
+	
+	-- SFX List: 
+	-- 0 : Player Die
+	-- 1 : Player jump
+	-- 2 : Interface cursor move
+	-- 3 : Interface confirm
+	-- 4 : Interface deny
+	-- 5 : Player Steps
+	-- 6 : Side Complete
+	-- 7 : Top Enemy Fire
+	
 end
 
 function debug_side()
@@ -997,6 +1036,7 @@ gamestate = {
 			
 		enter = function(self)
 			self.pl = 0
+			sfx_play(0)
 		end,
 	
 		update = function(self)
@@ -1026,6 +1066,7 @@ gamestate = {
 	[4] = { --sidescroll complete 
 		enter = function(self)
 			self.i = 0
+			sfx_play(6)
 		end,
 		
 		update = function(self)
@@ -1099,6 +1140,7 @@ gamestate = {
 	[6] = { -- top death
 		enter = function(self) 
 			self.pl = 0
+			sfx_play(0)
 		end, 
 		
 		update = function(self) 
@@ -1172,9 +1214,11 @@ gamestate = {
 		update = function(self)
 			if(btnp(3)) and (self.i < 2) then 
 				self.i += 1
+				sfx_play(2)
 			end
 			if(btnp(2)) and (self. i > 0) then
 				self.i -= 1
+				sfx_play(2)
 			end
 			
 			if(btnp(4)) then
@@ -1204,9 +1248,11 @@ gamestate = {
 		update = function(self) 
 			if(btnp(3)) and (self.i < (self.imax -1)) then 
 				self.i += 1
+				sfx_play(2)
 			end
 			if(btnp(2)) and (self. i > 0) then
 				self.i -= 1
+				sfx_play(2)
 			end
 			
 			if(btnp(4)) then
@@ -1215,11 +1261,13 @@ gamestate = {
 			end
 			
 			if(btnp(0)) then
+				sfx_play(4)
 				if(self.i == 0) then player_general.music = 0 end
 				if(self.i == 1) then player_general.sfx = 0 end
 			end
 			
 			if(btnp(1)) then
+				sfx_play(1)
 				if(self.i == 0) then player_general.music = 1 end
 				if(self.i == 1) then player_general.sfx = 1 end
 			end
@@ -1242,13 +1290,13 @@ gamestate = {
 			if(player_general.music == 1) then 
 				print("on", 70, y, 11)
 			else 
-				print("off", 70, y, 10)
+				print("off", 70, y, 8)
 			end
 			
 			if(player_general.sfx == 1) then
 				print("on", 70, y+8, 11)
 			else	
-				print("off", 70, y+8, 10)
+				print("off", 70, y+8, 8)
 			end
 			
 		end,
@@ -1456,3 +1504,12 @@ ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 5e75757571757572757575717575725e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 5e75757575757575757575757575755e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 6161616161616161616161616161616100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+__sfx__
+01040000186351a6351c6351d635186351a6351c6351d6353c6303063124631186310c63100631000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+010300001f35021351233510000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+01080000183301c335000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+01060000183301a330000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+010600000e3300c330000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+01070000106150c60000400004000c615004000040000400004000040000400004000040000400004000040000400004000040000400004000040000400004000040000400004000040000400004000040000000
+010a000024335213350000000000242322323121231212311f2311d2311c2311a2311823200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+010a00000063000630006301a6351a6001c6001c60000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
