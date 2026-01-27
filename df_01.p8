@@ -5,7 +5,7 @@ __lua__
 --by tibonev
 
 -- debug -- REMEMBER TO DISABLE BEFORE RELEASE --
-debug_side_en = true
+debug_side_en = false
 debug_top_en = false
 
 -- Code Init --
@@ -111,6 +111,7 @@ function init_vars()
 			en_top_spd_delta = 0.1,
 			en_top_shot_spd = 1,
 			pickups = 5,
+			blocks_top = 10
 		},
 		[2] = { 
 			en_side_spd_min = 0.6,
@@ -119,6 +120,7 @@ function init_vars()
 			en_top_spd_delta = 0.1,
 			en_top_shot_spd = 1,
 			pickups = 5,
+			blocks_top = 12
 		},
 		[3] = { 
 			en_side_spd_min = 0.7,
@@ -127,6 +129,7 @@ function init_vars()
 			en_top_spd_delta = 0.2,
 			en_top_shot_spd = 1.1,
 			pickups = 5,
+			blocks_top = 14
 		},
 		[4] = { 
 			en_side_spd_min = 0.8,
@@ -135,6 +138,7 @@ function init_vars()
 			en_top_spd_delta = 0.3,
 			en_top_shot_spd = 1.2,
 			pickups = 6,
+			blocks_top = 16
 		},
 		[5] = { 
 			en_side_spd_min = 0.9,
@@ -143,6 +147,7 @@ function init_vars()
 			en_top_spd_delta = 0.4,
 			en_top_shot_spd = 1.3,
 			pickups = 6,
+			blocks_top = 18
 		},
 		[6] = { 
 			en_side_spd_min = 0.9,
@@ -151,6 +156,7 @@ function init_vars()
 			en_top_spd_delta = 0.5,
 			en_top_shot_spd = 1.3,
 			pickups = 6,
+			blocks_top = 20
 		},
 		[7] = { 
 			en_side_spd_min = 1.0,
@@ -159,6 +165,7 @@ function init_vars()
 			en_top_spd_delta = 0.5,
 			en_top_shot_spd = 1.4,
 			pickups = 7,
+			blocks_top = 20
 		},
 		[8] = { 
 			en_side_spd_min = 1.0,
@@ -167,6 +174,7 @@ function init_vars()
 			en_top_spd_delta = 0.6,
 			en_top_shot_spd = 1.5,
 			pickups = 8,
+			blocks_top = 20
 		},
 		[9] = { 
 			en_side_spd_min = 1.0,
@@ -175,6 +183,7 @@ function init_vars()
 			en_top_spd_delta = 0.7,
 			en_top_shot_spd = 1.5,
 			pickups = 10,
+			blocks_top = 20
 		},
 		
 	}
@@ -493,6 +502,10 @@ function top_reset(new)
 	en_top_shots = {}
 	
 	if(new == 1) then 
+		for b in all(blocks_top) do
+			mset(b.x, b.y, 114)
+		end
+		
 		pickups_top = {}
 		blocks_top = {}
 		blocks_top_generate()
@@ -711,8 +724,8 @@ function blocks_top_generate()
 	local ty_max = 28
 	local new_x = flr(rnd(tx_max - tx_min + 1)) + tx_min
 	local new_y = flr(rnd(ty_max - ty_min + 1)) + ty_min
-		
-	for i = 1, 10, 1 do
+	
+	for i = 1, levels[currentlevel].blocks_top, 1 do
 		local valid = false
 		
 		repeat
@@ -1131,7 +1144,7 @@ gamestate = {
 			en_top_shots_draw()
 			
 			top_hud_draw()
-			
+				
 			if(debug_top_en == true) then
 				--rect(8, 136, 119, 248, 12)  -- Your target area
 				debug_top() 
@@ -1169,7 +1182,6 @@ gamestate = {
 	
 	[7] = { -- top complete
 		enter = function(self)
-			blocks_top = {}
 			self.i = 0
 		end, 
 		
