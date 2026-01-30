@@ -1408,7 +1408,6 @@ gamestate = {
 				spr(32, 1, y + (8*9))
 				print(": collect for points", 10, y + (8*9), 7)
 				
-				if(self.j > 10) then print("extra live every 30000 points", 1, y+(8*12), 10) end
 				print(chr(142), 120, 120, 11)
 			end
 		end,

@@ -33,8 +33,11 @@ let's face it, its very convenient for you.
 ## Build Instructions
 
 You need the paid version of [Pico-8](https://www.lexaloffle.com/pico-8.php) to compile / run the code.
-All you need to do is load 'datafilch.p8' and run. 
-More information about how to build binaries can be found in Pico-8's manual.
+Navigate to the root folder of the code and execute:
+
+`pico8 -export html` 
+
+you can replace "html" with "bin" to create native versions for your OS. 
 
 ## Releases 
 
