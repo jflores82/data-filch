@@ -2,6 +2,8 @@
 
 A retro arcade action game inspired by a famous Atari 2600 game with the same initials.
 
+Coded and built with [Pico-8](https://www.lexaloffle.com/pico-8.php)
+
 ## Plot
 
 You play as a industrial spy from _NotGood_ _Inc_, tasked with infiltrating the buildings of _VeryEvil_ _Corp_ to 
@@ -9,8 +11,9 @@ steal their data and secrets. Their security systems are top of the line and lit
 Are you a bad enough spy to ~~rescue~~ steal the data? 
 
 ## ScreenShots
+![Data Filch 01](https://classicgames.com.br/site/img/datafilch01.png) [Data Filch 02](https://classicgames.com.br/site/img/datafilch02.png)
 
-
+[Data Filch 03](https://classicgames.com.br/site/img/datafilch03.png) [Data Filch 04](https://classicgames.com.br/site/img/datafilch04.png)
 
 ## Instructions
 
@@ -35,15 +38,20 @@ let's face it, its very convenient for you.
 You need the paid version of [Pico-8](https://www.lexaloffle.com/pico-8.php) to compile / run the code.
 Navigate to the root folder of the code and execute:
 
-`pico8 -export html` 
+`pico8 -export datafilch.html` 
 
-you can replace "html" with "bin" to create native versions for your OS. 
+or you can open pico-8 and do: 
+
+`load datafilch.p8`
+`export datafilch.html`
+
+you can replace "html" with "bin" to create native versions for your OS, for more information, please refer to the pico-8 manual.
 
 ## Releases 
 
-Version 1. (20260131):
+Version 1 (20260202):
 
-- Initial Release
+- First Public Release
 
  
 ## License
