@@ -10,6 +10,7 @@ debug_top_en = false
 
 -- Code Init --
 function _init()
+	cartdata("data_filch")
 	init_vars()
 	state_switch(currentstate)
 end
@@ -47,6 +48,7 @@ function init_vars()
 		d_max = 4,
 		d_cooldown = 0,
 		d_cooldown_max = 30,
+		highscore = dget(0)
 	}
 	
 	player_top = { 
@@ -447,7 +449,12 @@ gamestate = {
 		end,
 		
 		update = function(self)
-			if(btn(4)) then
+			if(player_general.score > player_general.highscore) then 
+				dset(0, player_general.score)
+				player_general.highscore = player_general.score
+			end
+			
+			if(btn(5)) then
 				init_vars()
 				state_switch(game_states.title_screen)
 			end
@@ -457,7 +464,7 @@ gamestate = {
 			cls()
 			camera()
 			print("game over yeah!", 35, 30, 7)
-			print("press 🅾️ / z", 35, 100, 7)
+			print("press x", 35, 100, 7)
 			print("final score:"..player_general.score, 35, 50, 10)
 		end,
 	},
@@ -467,7 +474,7 @@ gamestate = {
 		end,
 		
 		update = function(self)
-			if(btnp(3)) and (self.i < 2) then 
+			if(btnp(3)) and (self.i < 3) then 
 				self.i += 1
 				sfx_play(2)
 			end
@@ -480,6 +487,10 @@ gamestate = {
 				if(self.i == 0) then state_switch(game_states.side_play) end
 				if(self.i == 1) then state_switch(game_states.options) end
 				if(self.i == 2) then state_switch(game_states.tutorial) end
+				if(self.i == 3) then 
+					dset(0, 0)
+					player_general.highscore = 0
+				end
 			end
 		end,
 				
@@ -487,9 +498,11 @@ gamestate = {
 			local y = 50
 			local ychr = y + (self.i * 8)
 			cls()
+			print("hi: "..tostr(player_general.highscore), 46, 5, 11)
 			print("start game", 46, y, 7)
 			print("options", 46, y + 8, 7) 
 			print("instructions", 46, y+16, 7)
+			print("clear hiscore", 46, y+24, 8)
 			
 			print(chr(23), 38, ychr, 10)
 		end,

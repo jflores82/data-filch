@@ -58,7 +58,7 @@ function en_side_collision()
 		
 		if(player_side.crouch == true) then pl_y = player_side.y + 5 end
 				
-		if(en_x + 8 > pl_x) and (en_x < pl_x + 6) and (en_y + 8> pl_y) and (en_y < pl_y + 9) then 
+		if(en_x + 8 > pl_x + 3) and (en_x < pl_x + 6) and (en_y + 8 > pl_y) and (en_y < pl_y + 6) then 
 			deli(en_side, i)
 			return true
 		end

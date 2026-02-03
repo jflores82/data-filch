@@ -12,8 +12,8 @@ Are you a bad enough spy to ~~rescue~~ steal the data?
 
 ## ScreenShots
 ![Data Filch 01](https://classicgames.com.br/site/img/datafilch1.png) ![Data Filch 02](https://classicgames.com.br/site/img/datafilch2.png)
-
 ![Data Filch 03](https://classicgames.com.br/site/img/datafilch3.png) ![Data Filch 04](https://classicgames.com.br/site/img/datafilch4.png)
+
 
 ## Instructions
 
@@ -49,8 +49,13 @@ you can replace "html" with "bin" to create native versions for your OS, for mor
 
 ## Releases 
 
-Version 1 (20260202):
+Version 2 (20260203):
+- Adjusted player hitbox to match player sprite instead of the whole tile.
+- Changed game over screen to require a X button press, instead of a O button, preventing a mispress.
+- Added high score routines, it saves to cart.
+- Added option on the main menu to clear the current saved hiscore.
 
+Version 1 (20260202):
 - First Public Release
 
  
