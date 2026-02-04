@@ -77,7 +77,7 @@ function en_top_shots_update()
 		local pl_x = player_top.x
 		local pl_y = player_top.y
 		
-		if(en_x + 8 > pl_x) and (en_x < pl_x + 6) and (en_y + 8> pl_y) and (en_y < pl_y + 9) and (player_top.safe == false) then 
+		if(en_x + 8 > pl_x + 3) and (en_x < pl_x + 5) and (en_y + 8> pl_y) and (en_y < pl_y + 8) and (player_top.safe == false) then 
 			deli(en_top_shots, i)
 			if (debug_top_en == false) then
 				state_switch(game_states.top_death)

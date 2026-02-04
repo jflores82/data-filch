@@ -49,13 +49,18 @@ you can replace "html" with "bin" to create native versions for your OS, for mor
 
 ## Releases 
 
-Version 2 (20260203):
+Version 1.2 (20260204):
+- Adjusted player hitbox on top down screen, especially regarding the goal.
+- Adjusted player x side view elevator collision, to be more precise.
+- Fixed bug that added more procedural blocks on the top view, after a gameover.
+
+Version 1.1 (20260203):
 - Adjusted player hitbox to match player sprite instead of the whole tile.
 - Changed game over screen to require a X button press, instead of a O button, preventing a mispress.
 - Added high score routines, it saves to cart.
 - Added option on the main menu to clear the current saved hiscore.
 
-Version 1 (20260202):
+Version 1.0 (20260202):
 - First Public Release
 
  

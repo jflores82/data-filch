@@ -45,6 +45,12 @@ function top_reset(new)
 	end
 end
 
+function top_clean()
+	for b in all(blocks_top) do
+		mset(b.x, b.y, 114)
+	end
+end
+
 function pickups_top_generate()
 	local tx_min = 1
 	local tx_max = 14
@@ -147,8 +153,9 @@ function goals_draw()
 	spr(goalspr, top_goals.safe_x, top_goals.safe_y)
 	
 	if(top_goals.made == true) then
-		if(top_goals.goal_x + 8 > player_top.x) and (top_goals.goal_x < player_top.x + 6) and (top_goals.goal_y + 8> player_top.y) and (top_goals.goal_y < player_top.y + 9) then 
-			madespr = 28
+		--if(top_goals.goal_x + 8 > player_top.x) and (top_goals.goal_x < player_top.x + 6) and (top_goals.goal_y + 8> player_top.y) and (top_goals.goal_y < player_top.y + 9) then 
+		if(top_goals.goal_x + 8 > player_top.x + 3) and (top_goals.goal_x < player_top.x + 5) and (top_goals.goal_y + 8 > player_top.y) and (top_goals.goal_y < player_top.y + 8) then
+ 			madespr = 28
 			top_goals.comp = true
 		end
 		spr(madespr, top_goals.goal_x, top_goals.goal_y)

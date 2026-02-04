@@ -8,6 +8,8 @@ __lua__
 debug_side_en = false
 debug_top_en = false
 
+version = "1.2 - 20260204"
+
 -- Code Init --
 function _init()
 	cartdata("data_filch")
@@ -261,7 +263,7 @@ gamestate = {
 			player_side_control()
 			en_side_update()
 			
-			if(player_side.x < 8 and player_side.y > 100 and player_side.y < 110) then
+			if(player_side.x < 4 and player_side.y > 100 and player_side.y < 110) then
 				state_switch(game_states.side_win)
 			end
 		end,
@@ -446,6 +448,7 @@ gamestate = {
 	[8] = { -- gameover 
 		enter = function(self)
 			music_play(3)
+			top_clean()
 		end,
 		
 		update = function(self)
@@ -662,6 +665,8 @@ gamestate = {
 			print("no ai of any kind was used", 1, y + (8*4), 7)
 			print("visit:", 1, y + (8*6), 7)
 			print("classicgames.com.br", 40, y + (8*6), 13)
+			
+			print("version: "..version, 1, y + (8*8), 10)
 			
 			if(self.i > 10) then
 				print("keep art and games human!", 15, y + (8*10), 8)
